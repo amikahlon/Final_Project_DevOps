@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  web:
+    container_name: odd-or-even-web
+    environment:
+      - NODE_ENV=prod
+      - PORT=3000
+    image: amikahlon/odd-or-even-web:latest
+    ports:
+      - "80:3000"

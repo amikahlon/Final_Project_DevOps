@@ -1,0 +1,141 @@
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #6b7280;
+  --btn: #111827;
+  --btn-text: #fff;
+  --secondary: #e5e7eb;
+
+  --good: #10b981;
+  --bad: #ef4444;
+  --even: #2563eb;
+  --odd: #a855f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.card {
+  width: min(520px, 92vw);
+  background: var(--card);
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+body {
+  background: linear-gradient(135deg, #f8fafc 0%, #a7c7e7 100%);
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Segoe UI", "Arial", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  padding: 40px 32px 32px 32px;
+  min-width: 340px;
+  max-width: 95vw;
+  margin: 32px 0;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #2a4d69;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  text-shadow: 0 2px 8px #e1e8ed;
+}
+
+.subtitle {
+  color: #4b6584;
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+}
+
+.footer {
+  width: 100vw;
+  text-align: center;
+  padding: 18px 0 10px 0;
+  color: #6c7a89;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  background: transparent;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 10;
+  user-select: none;
+}
+
+@media (max-width: 600px) {
+  .footer {
+    font-size: 0.9rem;
+    padding: 12px 0 6px 0;
+  }
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+input {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  outline: none;
+}
+
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--btn);
+  color: var(--btn-text);
+  cursor: pointer;
+  font-weight: 600;
+}
+button.secondary {
+  background: var(--secondary);
+  color: #111827;
+}
+
+#message {
+  min-height: 24px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#message.even {
+  color: var(--even);
+}
+#message.odd {
+  color: var(--odd);
+}
+#message.error {
+  color: var(--bad);
+}
