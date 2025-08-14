@@ -9,24 +9,30 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Build
-        run: docker build --tag app .
+      - name: Build test image
+        run: docker build --tag app:test .
 
-      - name: Run Docker
-        run: docker run -d --name app -p 80:3000 app
+      - name: Run container
+        run: docker run -d --name app -p 80:3000 app:test
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
-      - name: Install software
-        run: sudo apt-get install -y chromium-browser
-
-      - name: Install the necessary packages
+      - name: Install Python deps for tests
         run: pip install requests webdriver_manager selenium pytest
 
-      - name: Run the PyTest script
+      - name: Run PyTest
         run: pytest -rA
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker logs app || true
+          docker rm -f app || true
