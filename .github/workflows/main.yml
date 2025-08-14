@@ -3,15 +3,16 @@ name: upload my image to DockerHub
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
@@ -28,15 +29,38 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy site
-        uses: appleboy/ssh-action@master
+      # מעלים את ה-compose לשרת
+      - name: Upload docker-compose.yml
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
-          script_stop: true
+          source: "docker-compose.yml"
+          target: "/opt/app"
+
+      # דיפלוי דרך SSH
+      - name: Deploy site
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          script_stop: true # ימשיך להוציא Warning, אבל לא יפול. העצירה בפועל עם set -euo pipefail
           script: |
+            set -euo pipefail
+            sudo mkdir -p /opt/app
             cd /opt/app
-            sudo docker compose pull
-            sudo docker compose up -d --force-recreate
+
+            # תיאום בין גרסאות compose (v2 או הישן):
+            if docker compose version >/dev/null 2>&1; then
+              DC="docker compose"
+            else
+              DC="docker-compose"
+            fi
+
+            # מושכים ומרימים מחדש
+            sudo $DC pull
+            sudo $DC up -d --force-recreate
