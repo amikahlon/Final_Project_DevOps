@@ -6,7 +6,41 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    name: QA before build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build (test image)
+        run: docker build . --tag app:test
+
+      - name: Run container for tests
+        run: docker run -d --name app -p 80:3000 app:test
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install Python test deps
+        run: pip install requests webdriver_manager selenium pytest
+
+      - name: Run PyTest
+        run: pytest -rA
+
+      - name: Cleanup container
+        if: always()
+        run: |
+          docker logs app || true
+          docker rm -f app || true
+
   build:
+    name: Build & Push (only if QA passed)
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +51,7 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build
+      - name: Build image
         run: |
           docker build . --tag ${{ secrets.DOCKER_USER }}/${{ secrets.PROJECT }}:latest
 
@@ -26,6 +60,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USER }}/${{ secrets.PROJECT }}:latest
 
   deploy:
+    name: Deploy via SSH
     needs: build
     runs-on: ubuntu-latest
     steps:
