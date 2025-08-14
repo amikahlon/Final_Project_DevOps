@@ -29,18 +29,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      # מעלים את ה-compose לשרת
-      - name: Upload docker-compose.yml
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.PRIVATE_KEY }}
-          port: ${{ secrets.PORT }}
-          source: "docker-compose.yml"
-          target: "/opt/app"
-
-      # דיפלוי דרך SSH
       - name: Deploy site
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -48,19 +36,14 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
-          script_stop: true # ימשיך להוציא Warning, אבל לא יפול. העצירה בפועל עם set -euo pipefail
+          script_stop: true
           script: |
             set -euo pipefail
-            sudo mkdir -p /opt/app
-            cd /opt/app
-
-            # תיאום בין גרסאות compose (v2 או הישן):
+            cd /home/ubuntu/app
             if docker compose version >/dev/null 2>&1; then
               DC="docker compose"
             else
               DC="docker-compose"
             fi
-
-            # מושכים ומרימים מחדש
             sudo $DC pull
             sudo $DC up -d --force-recreate
