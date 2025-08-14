@@ -13,4 +13,4 @@ keypair: Final_Project_KeyPair
 aws_ubuntu_ami: ami-01e444924a2233b07
 server_type: t2.micro
 server_volume_size: 8
-vpc_id: vpc-0bfdc5d709100c5af
+vpc_id: vpc-01416f5fef9d26f94

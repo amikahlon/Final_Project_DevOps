@@ -111,7 +111,8 @@
         hostname: "{{ ec2_data.instances[0].public_ip_address }}"
         groups: app
         ansible_user: ubuntu
-        ansible_ssh_private_key_file: ~/Final_Project_KeyPair.pem
+        ansible_ssh_private_key_file: ~/.ssh/Final_Project_KeyPair.pem
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
 
     - name: Print EC2 instance public IP
       debug:
@@ -123,6 +124,9 @@
         port: 22
         timeout: 300
 
+# ==========================================================
+# Docker installation + deploy
+# ==========================================================
 - name: Deploy Docker app
   hosts: app
   user: ubuntu
@@ -148,8 +152,9 @@
           - containerd.io
           - docker-compose-plugin
         state: latest
+        update_cache: yes
 
-    - name: restart Docker service
+    - name: Restart Docker service
       service:
         name: docker
         state: restarted
@@ -163,7 +168,7 @@
 
     - name: Clone app repo
       git:
-        repo: git@github.com:AmiKahlon/DevOps_FinalProject-OddOrEven.git
+        repo: git@github.com:amikahlon/Final_Project_DevOps.git
         dest: /home/ubuntu/app
         version: main
         key_file: ~/.ssh/id_rsa
@@ -176,8 +181,8 @@
         chdir: /home/ubuntu/app
       with_items:
         - docker login -u {{ docker_user }} -p {{ docker_token }}
-        - docker build . -t {{ docker_user }}/odd_or_even
-        - docker push {{ docker_user }}/odd_or_even
+        - docker build . -t {{ docker_user }}/odd-or-even-web:latest
+        - docker push {{ docker_user }}/odd-or-even-web:latest
 
     - name: Start app with Docker Compose
       shell: docker compose up -d
@@ -185,7 +190,7 @@
         chdir: /home/ubuntu/app
 
     - name: Show public IP
-      shell: curl ident.me
+      shell: curl -s ident.me
       register: ip_address
 
     - debug:
