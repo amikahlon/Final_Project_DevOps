@@ -1,4 +1,3 @@
-# test_odd_even.py
 import time
 import requests
 
